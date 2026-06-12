@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>性剝削 24 小時引導評估</title>
+<style>
+  :root{
+    --paper:#EEF1F5; --card:#FFFFFF; --ink:#19212E; --ink2:#46566B; --ink3:#7F8DA0;
+    --line:#DCE2EA; --line2:#EAEEF3;
+    --trig:#C8362E; --trig-bg:#FBEDEC; --trig-line:#E6C3BF;
+    --tex:#A66208; --tex-bg:#FBF3E6; --tex-line:#EBD5B0;
+    --ibsa:#1A6E86; --ibsa-bg:#E9F3F6; --ibsa-line:#BDDCE4;
+    --route:#54467E; --route-bg:#EFEBF6; --route-line:#D2C8E6;
+    --ok:#2C7A4B; --ok-bg:#EDF6F0; --ok-line:#C7E3D1;
+    --sans:'Noto Sans TC','PingFang TC','Microsoft JhengHei',system-ui,sans-serif;
+    --mono:'SFMono-Regular',ui-monospace,'Roboto Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{font-family:var(--sans);background:var(--paper);color:var(--ink);line-height:1.6;font-size:16px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:720px;margin:0 auto;padding:0 14px}
+
+  header{background:var(--ink);color:#fff;padding:16px 0 14px}
+  .h-title{font-size:18px;font-weight:800;letter-spacing:.5px}
+  .h-sub{font-size:12px;color:#A9B6C8;margin-top:3px}
+
+  .stepper{position:sticky;top:0;z-index:40;background:var(--ink);padding:10px 0 12px;box-shadow:0 6px 14px -10px rgba(0,0,0,.5)}
+  .steps{display:flex;gap:5px}
+  .step-dot{flex:1;cursor:pointer;text-align:center}
+  .step-dot .bar{height:4px;border-radius:3px;background:rgba(255,255,255,.18);transition:.2s}
+  .step-dot .nm{font-size:10.5px;color:#8c9bb0;margin-top:6px;font-weight:600;white-space:nowrap}
+  .step-dot.done .bar{background:#5C6B82}
+  .step-dot.active .bar{background:#fff}
+  .step-dot.active .nm{color:#fff}
+
+  main{padding:18px 0 8px}
+  .screen{display:none}.screen.on{display:block}
+
+  .strip{border-radius:10px;padding:13px 15px;margin-bottom:16px}
+  .strip .tag{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;letter-spacing:.5px;margin-bottom:6px}
+  .strip h2{font-size:17px;margin-bottom:5px}
+  .strip p{color:var(--ink2);font-size:13.5px;line-height:1.55}
+  .strip .em{font-weight:800;color:var(--ink)}
+  .s-route{background:var(--route-bg);border:1px solid var(--route-line)} .s-route .tag{background:var(--route);color:#fff}
+  .s-trig{background:var(--trig-bg);border:1px solid var(--trig-line)} .s-trig .tag{background:var(--trig);color:#fff}
+  .s-tex{background:var(--tex-bg);border:1px solid var(--tex-line)} .s-tex .tag{background:var(--tex);color:#fff}
+  .s-ibsa{background:var(--ibsa-bg);border:1px solid var(--ibsa-line)} .s-ibsa .tag{background:var(--ibsa);color:#fff}
+  .s-sum{background:var(--ok-bg);border:1px solid var(--ok-line)} .s-sum .tag{background:var(--ok);color:#fff}
+
+  .grp{font-size:12.5px;font-weight:800;letter-spacing:.4px;margin:20px 2px 8px;color:var(--ink3)}
+  .grp:first-of-type{margin-top:2px}
+  .grp.red{color:var(--trig)} .grp.amb{color:var(--tex)} .grp.tealc{color:var(--ibsa)}
+  .grp .gsub{display:block;font-size:11.5px;font-weight:500;color:var(--ink3);margin-top:3px;line-height:1.5}
+  .face{font-size:11.5px;font-weight:700;color:var(--ink2);margin:11px 2px 5px}
+
+  .opt{background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:8px;overflow:hidden;transition:border-color .12s}
+  .opt-h{display:flex;align-items:flex-start;gap:11px;padding:13px;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}
+  .box{flex:none;width:22px;height:22px;border-radius:6px;border:2px solid #C2CCD8;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:.12s;background:#fff}
+  .box svg{width:13px;height:13px;opacity:0;transform:scale(.5);transition:.12s}
+  .opt.sel .box svg{opacity:1;transform:scale(1)}
+  .opt.sel.c-trig .box,.opt.sel.c-flip .box{background:var(--trig);border-color:var(--trig)}
+  .opt.sel.c-flag .box{background:var(--tex);border-color:var(--tex)}
+  .opt.sel.c-tex .box{background:var(--tex);border-color:var(--tex)}
+  .opt.sel.c-ibsa .box{background:var(--ibsa);border-color:var(--ibsa)}
+  .opt.sel.c-ret .box{background:var(--ok);border-color:var(--ok)}
+  .opt.sel.c-ret{border-color:var(--ok-line)}
+  .opt.sel.c-trig,.opt.sel.c-flip{border-color:var(--trig-line)}
+  .opt.sel.c-flag,.opt.sel.c-tex{border-color:var(--tex-line)}
+  .opt.sel.c-ibsa{border-color:var(--ibsa-line)}
+  .opt-txt{flex:1}
+  .opt-title{font-size:14.5px;font-weight:600;line-height:1.45}
+  .code{font-family:var(--mono);font-size:11.5px;font-weight:700;color:#fff;border-radius:5px;padding:2px 6px;margin-right:7px;vertical-align:middle;background:#8694A6}
+  .c-trig .code{background:var(--trig)}
+  .pill{display:inline-block;font-size:10px;font-weight:700;border-radius:4px;padding:1px 5px;margin-left:6px;vertical-align:middle;white-space:nowrap}
+  .pill.now{color:var(--trig);background:var(--trig-bg);border:1px solid var(--trig-line)}
+  .pill.gray{color:var(--tex);background:var(--tex-bg);border:1px solid var(--tex-line)}
+  .pill.flip{color:#fff;background:var(--trig)}
+  .pill.flag{color:#fff;background:var(--tex)}
+  .pill.info{color:var(--ibsa);background:var(--ibsa-bg);border:1px solid var(--ibsa-line)}
+  .more{flex:none;font-size:11px;color:var(--ibsa);font-weight:700;margin-top:3px;border:1px solid var(--ibsa-line);background:var(--ibsa-bg);border-radius:6px;padding:3px 7px;cursor:pointer}
+  .guide{display:none;padding:0 13px 13px 46px;font-size:13px;color:var(--ink2)}
+  .opt.exp .guide{display:block}
+  .guide .lbl{font-size:11px;font-weight:800;letter-spacing:.4px;margin:9px 0 4px;color:var(--ibsa)}
+  .guide .lbl.j{color:var(--trig)}
+  .guide ul{list-style:none;padding:0}
+  .guide li{padding-left:13px;position:relative;margin-bottom:4px;line-height:1.5}
+  .guide li::before{content:"›";position:absolute;left:0;color:var(--ibsa);font-weight:700}
+  .guide .jl li::before{content:"–";color:var(--ink3)}
+  .guide .tip{background:#FFF8E6;border:1px solid #F0E0B0;border-radius:7px;padding:8px 10px;color:#7A5A10;margin-top:8px;font-size:12.5px;line-height:1.5}
+
+  .remind{display:none;font-size:11.5px;color:var(--ink3);padding:0 13px 11px 46px;line-height:1.5}
+  .opt.sel .remind{display:block}
+  .remind b{color:var(--tex);font-weight:700}
+
+  .qrow{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:13px;margin-bottom:8px}
+  .qrow .q{font-size:14.5px;font-weight:600;margin-bottom:10px;line-height:1.45}
+  .qrow .q .note{display:block;font-size:12px;color:var(--ink3);font-weight:400;margin-top:3px}
+  .seg{display:flex;gap:7px}
+  .seg button{flex:1;border:1.5px solid var(--line);background:#fff;border-radius:8px;padding:9px;font-family:var(--sans);font-size:14px;font-weight:700;color:var(--ink2);cursor:pointer;transition:.12s}
+  .seg button.on-yes{background:var(--route);border-color:var(--route);color:#fff}
+  .seg button.on-no{background:#56627A;border-color:#56627A;color:#fff}
+  .seg button.on-type{background:var(--route);border-color:var(--route);color:#fff}
+  .seg button.on{background:var(--route);border-color:var(--route);color:#fff}
+  .note-box{background:var(--tex-bg);border:1px solid var(--tex-line);border-radius:9px;padding:10px 12px;font-size:12.5px;color:#7A5A10;line-height:1.5;margin-top:8px}
+  .abcwrap{margin-top:10px;padding:12px;background:#F7F9FB;border:1px solid var(--line2);border-radius:10px}
+  .propnone-btn{margin-top:12px;width:100%;border:1.5px solid var(--ok-line);background:var(--ok-bg);border-radius:9px;padding:11px 10px;font-family:var(--sans);font-size:13px;font-weight:700;color:var(--ok);cursor:pointer;line-height:1.45}
+  .propnone-btn:active{background:#dcefe2}
+  .conclusion{border-radius:12px;padding:18px 16px;margin-bottom:14px;text-align:center;color:#fff}
+  .conclusion .big{font-size:23px;font-weight:800;line-height:1.3}
+  .conclusion .mid{font-size:15px;font-weight:700;margin-top:7px;opacity:.96}
+  .conclusion .sm{font-size:12px;font-weight:500;margin-top:8px;opacity:.9;line-height:1.5}
+  .conclusion.place{background:var(--trig)}
+  .conclusion.supervise{background:var(--tex)}
+  .conclusion.back{background:var(--ok)}
+  .conclusion.refer{background:#3A4A63}
+  .conclusion.reframe{background:var(--route)}
+  .conclusion.exit{background:#8a4b22}
+
+  .result{border-radius:10px;padding:12px 14px;margin:14px 0 4px;font-size:13.5px;line-height:1.5;display:none}
+  .result.show{display:block}
+  .result.fire{background:var(--trig);color:#fff}
+  .result.warn{background:var(--tex);color:#fff}
+  .result.calm{background:var(--ok);color:#fff}
+  .result.info{background:#3A4A63;color:#fff}
+  .result b{font-weight:800}
+  .result .sub{font-size:12px;opacity:.92;margin-top:3px}
+
+  .reminder{border-radius:10px;padding:12px 14px;margin:10px 0;font-size:13px;line-height:1.55;background:#FFF4ED;border:1px solid #F3D2BC;color:#8A4B22;display:none}
+  .reminder.show{display:block}
+  .reminder b{color:#6E3A19}
+
+  .sumbox{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:14px}
+  .sum-line{padding:12px 14px;border-top:1px solid var(--line2);font-size:13.5px;line-height:1.5}
+  .sum-line:first-child{border-top:none}
+  .sum-line .k{font-size:11px;font-weight:800;color:var(--ink3);letter-spacing:.4px;margin-bottom:3px}
+  .sum-line .v{color:var(--ink)}
+  .sum-line.head .v{font-weight:800}
+  .sum-line.fire{background:var(--trig-bg)} .sum-line.fire .v{color:var(--trig)}
+  .sum-line.calm{background:var(--ok-bg)} .sum-line.calm .v{color:var(--ok)}
+
+  .recov{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:12px}
+  .recov .rl{font-size:11px;font-weight:800;color:var(--ink3);letter-spacing:.4px;margin-bottom:9px}
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{border:1.5px solid var(--line);background:#fff;border-radius:20px;padding:7px 13px;font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer;transition:.12s}
+  .chip.on{background:var(--ok);border-color:var(--ok);color:#fff}
+
+  .draft-lbl{font-size:11px;font-weight:800;color:var(--ink3);letter-spacing:.4px;margin:8px 2px 6px}
+  .draft{width:100%;min-height:230px;border:1px solid var(--line);border-radius:10px;padding:12px;font-family:var(--sans);font-size:13px;line-height:1.7;color:var(--ink);background:#FBFCFD;resize:vertical}
+  .copybar{display:flex;gap:8px;margin-top:8px}
+  .btn{flex:1;border:none;border-radius:9px;padding:12px;font-family:var(--sans);font-size:14px;font-weight:700;cursor:pointer}
+  .btn-pri{background:var(--ink);color:#fff} .btn-sec{background:#fff;border:1.5px solid var(--line);color:var(--ink2)}
+
+  .navbar{background:#fff;border-top:1px solid var(--line);padding:14px 14px calc(16px + env(safe-area-inset-bottom));margin-top:14px}
+  .navbar .inner{max-width:720px;margin:0 auto;display:flex;gap:10px}
+  .nav-btn{border:none;border-radius:10px;padding:13px;font-family:var(--sans);font-size:15px;font-weight:700;cursor:pointer}
+  .nav-back{flex:none;width:88px;background:#EDF0F4;color:var(--ink2)}
+  .nav-next{flex:1;background:var(--ink);color:#fff}
+  .foot{font-size:11px;color:var(--ink3);line-height:1.6;padding:8px 2px 0}
+</style>
+</head>
+<body>
+
+<header><div class="wrap">
+  <div class="h-title">性剝削 24 小時引導評估</div>
+  <div class="h-sub">陪偵現場 · 第一次單獨會談時逐步判別 · 條例第 15、16 條</div>
+</div></header>
+
+<div class="stepper"><div class="wrap"><div class="steps" id="steps">
+  <div class="step-dot" data-s="0"><div class="bar"></div><div class="nm">案件性質</div></div>
+  <div class="step-dot" data-s="1"><div class="bar"></div><div class="nm">法定觸發</div></div>
+  <div class="step-dot" data-s="2"><div class="bar"></div><div class="nm">危機覆判</div></div>
+  <div class="step-dot" data-s="3"><div class="bar"></div><div class="nm">數位補充</div></div>
+  <div class="step-dot" data-s="4"><div class="bar"></div><div class="nm">評估小結</div></div>
+</div></div></div>
+
+<main class="wrap">
+
+<section class="screen" data-screen="0">
+  <div class="strip s-route"><span class="tag">STEP 1　案件性質與分流</span>
+    <h2>這是什麼案、孩子現在在哪</h2>
+    <p>先判是不是性剝削(屬性)→ 孩子現在在哪(狀態)→ 程序標記。判成非屬,後面安置流程不適用。</p>
+  </div>
+  <div class="qrow"><div class="q">案件型態<span class="note">先分清楚實體或數位,決定屬性判別與數位補充要不要跑。</span></div>
+    <div class="seg" id="caseTypeSeg">
+      <button data-v="實體">實體接觸型</button>
+      <button data-v="數位">數位網路型</button>
+      <button data-v="兼具">兩者兼具</button>
+    </div></div>
+
+  <div id="propSec" style="display:none">
+    <div class="qrow"><div class="q">是否構成性剝削?<span class="note">數位/影像型先判屬性。這是閘門:非屬則後面流程不適用。</span></div>
+      <div class="note-box" id="propReal" style="display:none">實體對價、坐檯陪酒或性交/猥褻接觸 → 依條例 §2 第 1、4 款構成性剝削,無須再判影像門檻。</div>
+      <div id="propDigital" style="display:none">
+        <div class="seg" id="propSeg">
+          <button data-v="已確認">已確認屬性剝削</button>
+          <button data-v="需判別">需判別</button>
+          <button data-v="非屬">傾向非屬</button>
+        </div>
+        <div class="abcwrap" id="abcBox" style="display:none">
+          <div class="grp tealc">A. 內容是否達性影像/猥褻門檻?<span class="gsub">刑法§10。僅泳裝/內衣/清涼、影像模糊、未達猥褻 → 不勾。</span></div>
+          <div id="listA"></div>
+          <div class="grp red">B. 是否具剝削/被害要素?<span class="gsub">純自拍、同儕合意、無散布脅迫對價 → 不勾。</span></div>
+          <div id="listB"></div>
+          <div id="propCsec">
+            <div class="grp amb">C. 另有實體剝削?<span class="gsub">勾此即構成性剝削,與影像門檻無關。</span></div>
+            <div id="listC"></div>
+          </div>
+          <button class="propnone-btn" id="propNoneBtn">以上皆不成立(純自拍、同儕合意、未達猥褻門檻)→ 傾向非屬,不列為保護個案</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="statusSec" style="display:none">
+    <div class="qrow"><div class="q">兒少當前狀態<span class="note">決定安置引擎要不要重新框定。</span></div>
+      <div class="seg" id="statusSeg">
+        <button data-v="在家">在家/社區</button>
+        <button data-v="已安置">已在安置中</button>
+        <button data-v="感化">感化教育/矯正中</button>
+      </div></div>
+  </div>
+
+  <div id="flagsSec" style="display:none"><div id="routeQs"></div></div>
+  <div class="result info" id="routeResult"></div>
+  <div class="reminder" id="csaReminder">
+    <b>提醒:本案涉性交或猥褻接觸。</b>應啟動性侵害減述評估(減少被害人重複陳述/司法整合性服務)——通知檢警安排訊前訪視。坐檯陪酒、拍攝影像、視訊表演等無接觸類不適用減述。性剝削指標仍續評。
+  </div>
+</section>
+
+<section class="screen" data-screen="1">
+  <div class="strip s-trig"><span class="tag">STEP 2　法定觸發</span>
+    <h2>24 小時必要安置指標</h2>
+    <p class="em">勾到任何一項,即須啟動緊急安置。單一觸發、不計分。灰區項目先按「判別」確認算不算成立,再勾。</p>
+  </div>
+  <div class="result info" id="trigNote"></div>
+  <div id="trigList"></div>
+  <div class="result fire" id="trigResult"></div>
+  <div id="retBox" style="display:none">
+    <div class="grp">返家可行性判別 · 家庭能否保護</div>
+    <div class="result info" id="retNote"></div>
+    <div class="reminder" id="retBias" style="display:none">數位/影像型對價剝削雖無實體接觸,傷害不亞於實體。不安置(帶回)的理由必須是「家庭能保護」,不能是「感覺沒那麼嚴重」。</div>
+    <div id="retList"></div>
+    <div class="result" id="retResult"></div>
+  </div>
+</section>
+
+<section class="screen" data-screen="2">
+  <div class="strip s-tex"><span class="tag">STEP 3　危機覆判</span>
+    <h2>覆判:紅旗、翻盤、處遇</h2>
+    <p>24 小時指標 決定要不要安置。這層只做三件事:先攔重大人身安全、再補家長因素的漏(會翻盤)、最後畫創傷與脆弱輪廓(定處遇)。只勾「成立」的條件,不用逐項分級。</p>
+  </div>
+  <div class="result info show" id="texCarry"></div>
+  <div id="cvList"></div>
+  <div class="result" id="cvResult"></div>
+</section>
+
+<section class="screen" data-screen="3">
+  <div class="strip s-ibsa"><span class="tag">STEP 4　數位補充</span>
+    <h2>IBSA / 數位性剝削三軸</h2>
+    <p>純線上性影像案,前面指標常全不勾、落在不安置——多半對。但三個軸前面不會問。<span class="em">不觸發安置,是安全前提與後追依據。</span>數位案才需要跑。</p>
+  </div>
+  <div class="result info" id="ibsaNote"></div>
+  <div id="ibsaList"></div>
+  <div class="result warn" id="ibsaResult"></div>
+</section>
+
+<section class="screen" data-screen="4">
+  <div class="strip s-sum"><span class="tag">STEP 5　小結</span>
+    <h2>評估小結與草稿</h2>
+    <p>上半是即時判斷結果(畫面用),下半是留白草稿(可複製貼進紀錄)。畫面上的提醒不會帶進草稿。全程本機運算、不上傳。</p>
+  </div>
+  <div class="recov" id="protectBox">
+    <div class="rl">列為保護個案要件(數位手冊 · 任一成立即建議列為;達安置者必列)</div>
+    <div id="protectList"></div>
+  </div>
+  <div class="sumbox" id="sumBox"></div>
+  <div class="draft-lbl">留白草稿(＿＿處由社工自行填寫案情)</div>
+  <textarea class="draft" id="draft"></textarea>
+  <div class="copybar">
+    <button class="btn btn-pri" id="copyBtn">複製草稿</button>
+    <button class="btn btn-sec" id="resetBtn">全部重來</button>
+  </div>
+  <div class="foot">
+    資料來源:衛福部/台灣展翅《兒少性剝削防制新法工作手冊》24 小時指標、附錄四(廖美蓮);《數位網路兒少性剝削工作手冊》。STEP 3 翻盤檢核為附錄四家長因素之操作化,STEP 4 三軸為製作者自訂補充,均非法定核對表項目。<br>
+    本工具為現場判別輔助,不取代專業評估、督導確認與正式核對表填寫。v3 · 測試中。<br>
+    使用意見回饋請洽製作者　張博鈞　10033641@mail.tycg.gov.tw
+  </div>
+</section>
+
+</main>
+
+<div class="navbar"><div class="inner">
+  <button class="nav-btn nav-back" id="backBtn">上一步</button>
+  <button class="nav-btn nav-next" id="nextBtn">下一步</button>
+</div></div>
+
+<script>
+"use strict";
+var CHK='<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>';
+
+var ROUTE=[
+  {id:"q1",q:"被害人未滿 12 歲(實歲),或有心智障礙等難以自我保護情形?",note:"此時雖依性剝削條例,須評估競合兒少權法、以最佳利益為最高保護原則。"},
+  {id:"q2",q:"本案有對被害人的性交或猥褻接觸行為?",note:"指性交易之性交/猥褻等實際接觸;不含坐檯陪酒、拍攝影像、視訊表演。有接觸才走性侵害減述。"}
+];
+
+var PROP_A=[
+  {c:"A1",t:"露出性器或隱私部位(生殖器、胸部、臀部、會陰)"},
+  {c:"A2",t:"性交、自慰、口交,或以身體/器物接觸隱私部位"},
+  {c:"A3",t:"性化姿勢,客觀上足以引起性慾或羞恥"}
+];
+var PROP_B=[
+  {c:"B1",t:"有對價或利益交換(金錢、點數、財物、好處)"},
+  {c:"B2",t:"遭誘騙、情感操控、脅迫或性勒索(取得或散布)"},
+  {c:"B3",t:"成年人涉入,或明顯權力不對等"},
+  {c:"B4",t:"被利用供人觀覽、散布、製作流通"}
+];
+var PROP_C=[{c:"C1",t:"另有實體對價、坐檯陪酒,或性交/猥褻接觸(§2 第 1、4 款)"}];
+
+var TRIG=[
+ {grp:"（一)兒童少年風險因素",items:[
+  {c:"1a",t:"未滿 12 歲(實歲)",pill:"now",tip:"核對年齡/身分,曾有冒用或誤植。未滿 12 歲若家長不出面,不必考慮其他因素直接安置。純性影像案:1a 一定勾,但這是脆弱性訊號不是安置命令——若家庭具保護功能、加害人已無法接觸,正解是阻斷加害人接觸+在家支持,經返家可行性帶回,而非離家安置。"},
+  {c:"1b",t:"滿 12 歲,但家長/主要照顧者未出面處理",pill:"gray",
+    j:["除外:家長在國外/外縣市/工作等不可抗力,且有其他成年親屬到場 → 可不安置。","『到場』≠『會保護』;到場卻否認、到場卻無作為,不算解除。"]},
+  {c:"2a",t:"中輟(中離)",note:"未請假/不明原因未到校達 3 日以上,或轉學未報到。"},
+  {c:"2b",t:"就學不穩定",pill:"gray",j:["缺課率超過 1/4,或每週固定 1–2 天缺課。","『有無穩定工作』不納入評估;單一偶發+穩定打工不宜只因此安置。"]},
+  {c:"3a",t:"現場疑似有吸毒(戒斷)反應",note:"打呵欠、流淚流鼻水、盜汗、失眠、厭食、嘔吐、發冷、肌肉疼痛;符合 3–5 項以上再直接問。"},
+  {c:"3b",t:"已確定使用毒品",note:"協調警方確認驗尿意願、請示檢察官。受毒品控制涉性產業宜立即安置。"},
+  {c:"4",t:"主觀對返家感到不安或害怕(含社工觀察)",pill:"gray",
+    j:["看肢體訊號:焦躁、摳手指、發抖、口語與反應不一致、不恰當傻笑。","主觀『不怕』不等於安全——兒少未必意識到危機。"]},
+  {c:"5",t:"對剝削者或色情行業高度認同",pill:"gray",
+    j:["媒介常是熟識信任者(馬伕、男女友、乾哥姊);關係越緊密返家再涉入風險越高。","依賴替代型:非典型正向情感不是同意或無傷的證據。"]},
+  {c:"6a",t:"前有因遭受性剝削被救援之經驗",note:"先查系統前案;查不到再問是否遇過臨檢、被社會局安置過。"},
+  {c:"6b",t:"曾多次遭受性剝削,但從未被救援",note:"反覆確認有無未通報、未開案之兒保案件與未揭露家暴。"}
+ ]},
+ {grp:"（二)家長 / 主要照顧者風險因素",items:[
+  {c:"7a",t:"家長為性剝削媒介,事後收取金錢",note:"媒介含介紹、利用、引薦。"},
+  {c:"7b",t:"家長知悉並且同意兒少的行為",pill:"now",j:["7a/7b 任一成立,應立刻啟動緊急安置。"]},
+  {c:"8a",t:"家長主觀感受無法管教兒少",pill:"gray",j:["參酌家長表述權,問他對『沒有能力』的主觀感受。","刻意不定義『沒能力』,避免標籤身障/單親/隔代。"]},
+  {c:"8b",t:"家長知悉遭受性剝削但無法有效制止",pill:"gray",j:["可能沒意識到、缺乏知識,或價值觀問題。知情卻無法阻止已抵觸兒少權法。"]},
+  {c:"8c",t:"對返家人身安全有疑慮,但提不出安全對策",pill:"gray",j:["綜合家長是否出面、聯絡、態度一起看。仍決定返家須介入家庭處遇。"]}
+ ]},
+ {grp:"（三)不利環境因素 / （四)其他",items:[
+  {c:"9a",t:"無家可歸 / 居無定所 / 離家需自籌生活費",pill:"gray",j:["暫時外宿 ≠ 居無定所;查住處是否暫時、是否付租、生活費怎麼來。"]},
+  {c:"9b",t:"同住者涉入色情產業",note:"同住家人手足、男女友、室友涉色情;或父母從事八大行業間接影響。"},
+  {c:"10",t:"社工自填(現場特殊判斷)",note:"前 9 項不勾但你判斷需安置,理由寫這裡並同步寫進敘事欄。"}
+ ]}
+];
+
+var FANPAN_HI=[
+  {c:"P1",t:"家長/主要照顧者服刑中"},
+  {c:"P2",t:"家長/主要照顧者有藥癮或酒癮"},
+  {c:"P3",t:"家長/主要照顧者無法提供兒少基本經濟需求"},
+  {c:"P4",t:"家長/主要照顧者無法說明兒少就學、就業、交友或行蹤"},
+  {c:"P5",t:"家長過去有家暴記錄,且案件持續中(非已結案)"},
+  {c:"P6",t:"親子關係嚴重衝突或破裂;或家長現場反應強烈、苛刻責罵"}
+];
+var FANPAN_MID=[
+  {c:"M1",face:"威脅",t:"無法保護/防止兒少遠離性販賣"},
+  {c:"M2",face:"威脅",t:"過去有家暴記錄,已處理結案"},
+  {c:"M3",face:"知情配合",t:"疑似知情兒少涉入對價剝削"},
+  {c:"M4",face:"知情配合",t:"有可能影響兒少照顧安全之前科"},
+  {c:"M5",face:"知情配合",t:"對兒少就學/就業/交友/行蹤認知有落差"},
+  {c:"M7",face:"關係",t:"家庭關係疏離衝突"},
+  {c:"M8",face:"關係",t:"無法到場,且未視兒少處境為最優先"}
+];
+var TEXTURE=[
+  {c:"T1",t:"案主另有性侵害受害經驗",
+    remind:"<b>提醒:</b>併辦性侵害減述評估、評估競合兒少權法、後追留意創傷延遲揭露",
+    open:"案主另有性侵害受害經驗，",at:"safety"},
+  {c:"T2",t:"其他受虐史(目睹家暴/遭家暴或霸凌)",
+    remind:"<b>提醒:</b>處遇納入創傷知情觀點",
+    open:"案主過往受虐經驗:",at:"safety"},
+  {c:"T3",t:"剝削已慢性化(持續/不止一次/曾擔任媒介)",
+    remind:"<b>提醒:</b>再涉入風險較高,提高後追密度",
+    open:"本案非單一偶發，",at:"safety"},
+  {c:"T4",t:"家庭脆弱因素(小爸媽/父母衝突/精神或重大醫療)",
+    remind:"<b>提醒:</b>評估親職功能影響,轉介脆弱家庭或家庭處遇方案",
+    open:"案家脆弱因素:",at:"parent"}
+];
+var REDFLAG=[
+  {c:"R1",t:"遭綁架或強迫監禁",kind:"flip"},
+  {c:"R2",t:"兒少與加害人同住",kind:"flag"},
+  {c:"R3",t:"嚴重自傷或創傷反應需醫療;或懷孕中且無穩定照顧者",kind:"flag"}
+];
+
+var PROTECT=[
+  {c:"O1",t:"有成年人涉入"},
+  {c:"O2",t:"遭到誘拐、脅迫或勒索"},
+  {c:"O3",t:"兒少無法行使同意能力(如心智障礙)"},
+  {c:"O4",t:"影像內容不符兒少身心發展階段,或涉及暴力(如 9 歲兒童自慰)"},
+  {c:"O5",t:"非第一次發生"},
+  {c:"O6",t:"有立即性傷害風險(如散布導致自傷/自殺傾向)"}
+];
+
+var RETURN=[
+  {c:"H1",t:"家長/主要照顧者出面,且有保護意願與能力"},
+  {c:"H2",t:"家長已提出具體安全計畫(如管制手機、約定門禁)"},
+  {c:"H3",t:"加害人已無法接觸兒少(數位案:已封鎖、調整隱私、身分未外洩;同儕/同校案:已由校方分班、校安、禁止接觸約定阻斷)"},
+  {c:"H4",t:"兒少對返家無顯著不安"}
+];
+var FAM_INCAP=['1b','7a','7b','8a','8b','8c'];
+
+var IBSA=[
+ {grp:"軸一　接觸性 — 加害人還能不能碰到孩子?",items:[
+  {c:"C1a",t:"加害人掌握真實身分(真名/住址/校名/作息)"},
+  {c:"C1b",t:"加害人是同儕/熟人/可實體接觸"},
+  {c:"C1c",t:"尚未封鎖帳號或調整社群隱私"},
+  {c:"C1d",t:"加害人仍持續傳訊、要求或威脅"}
+ ]},
+ {grp:"軸二　擴散性 — 影像跑出去了沒?還會不會跑?",items:[
+  {c:"C2a",t:"影像已外流/上架,或有多名收受者"},
+  {c:"C2b",t:"遭威脅散布(性勒索)"},
+  {c:"C2c",t:"尚未截圖蒐證即封鎖,或未送性影像處理中心/性影像比對移除計畫下架"}
+ ]},
+ {grp:"軸三　衝擊性 — 當下平穩 ≠ 沒有創傷",items:[
+  {c:"C3a",t:"孩子對加害人表現出喜歡、依戀或維護(看起來「沒事」)",mini:"依賴替代型:剝削填補依附空缺時,孩子可能對加害人呈現喜歡、依戀或維護,這是依賴動力,不是同意、也不是沒受傷。但這是「不要因為孩子看起來沒事就鬆手」的訊號,不是「孩子說的不算」的理由——仍要聽他怎麼說(表意權),把依賴動力當成要探究的假設、不是定論。需先建立行為基線,必要時提督導討論。本項不觸發安置,僅供處遇與後追參考。"},
+  {c:"C3b",t:"因身心發展限制而無受害感、無法理解傷害"},
+  {c:"C3c",t:"會談中出現議題觸發型情緒壓抑(需先建立行為基線)"}
+ ]}
+];
+
+var state={caseType:'',prop:'',pa:{},pb:{},pc:{},status:'',route:{},trig:{},ret:{},peerPerp:false,planWeak:false,fan:{},altCarer:false,tex:{},red:{},prot:{},ibsa:{},recov:{},step:0};
+function el(h){var d=document.createElement('div');d.innerHTML=h.trim();return d.firstChild;}
+
+function renderRoute(){
+  var box=document.getElementById('routeQs');box.innerHTML='';
+  ROUTE.forEach(function(q){
+    var ans=q.ans||['是','否'];
+    var n=el('<div class="qrow"><div class="q">'+q.q+'<span class="note">'+q.note+'</span></div>'+
+      '<div class="seg"><button data-v="yes">'+ans[0]+'</button><button data-v="no">'+ans[1]+'</button></div></div>');
+    var btns=n.querySelectorAll('.seg button');
+    btns.forEach(function(b){b.addEventListener('click',function(){
+      state.route[q.id]=b.dataset.v;btns.forEach(function(x){x.className='';});
+      b.className=b.dataset.v==='yes'?'on-yes':'on-no';evalRoute();
+    });});
+    box.appendChild(n);
+  });
+}
+function any(o){return Object.keys(o).some(function(k){return o[k];});}
+function propResult(){
+  if(state.caseType==='實體')return '屬';
+  if(!state.caseType)return '';
+  if(state.prop==='已確認')return '屬';
+  if(state.prop==='非屬')return '非屬';
+  if(state.prop==='需判別'){
+    var a=any(state.pa),b=any(state.pb),c=(state.caseType==='兼具')&&any(state.pc);
+    if(c)return '屬';
+    if(a&&b)return '屬';
+    if(a&&!b)return '待確認';
+    if(!a&&b)return '待確認';
+    return '';
+  }
+  return '';
+}
+function showEl(id,on){var e=document.getElementById(id);if(e)e.style.display=on?'':'none';}
+function placedStatus(){return state.status==='已安置'||state.status==='感化';}
+function evalRoute(){
+  var ct=state.caseType,dig=(ct==='數位'||ct==='兼具');
+  showEl('propSec',!!ct);
+  showEl('propReal',ct==='實體');
+  showEl('propDigital',dig);
+  showEl('abcBox',dig&&state.prop==='需判別');
+  showEl('propCsec',state.caseType==='兼具');
+  showEl('propNoneBtn',dig&&state.prop==='需判別'&&!any(state.pa)&&!any(state.pb)&&!((state.caseType==='兼具')&&any(state.pc)));
+  document.querySelectorAll('#propSeg button').forEach(function(b){b.classList.toggle('on',b.dataset.v===state.prop);});
+  document.querySelectorAll('#statusSeg button').forEach(function(b){b.classList.toggle('on',b.dataset.v===state.status);});
+  var pr=propResult(),ok=(pr==='屬'||pr==='待確認');
+  showEl('statusSec',ok);showEl('flagsSec',ok);
+  var r=state.route,res=document.getElementById('routeResult'),rem=document.getElementById('csaReminder');
+  if(pr==='非屬'){
+    res.className='result fire show';
+    res.innerHTML='<b>傾向非屬性剝削。</b><div class="sub">未達猥褻/性影像門檻(清涼照、模糊影像、未實際拍攝猥褻),難認達猥褻程度之性影像。確認後依非性剝削處理(轉介、網安/自我保護輔導),後續 24 小時安置流程不適用。</div>';
+    rem.classList.remove('show');return;
+  }
+  if(!ok){res.classList.remove('show');rem.classList.remove('show');return;}
+  if(r.q1===undefined||r.q2===undefined){res.classList.remove('show');rem.classList.remove('show');return;}
+  var contact=(r.q2==='yes'),vuln=(r.q1==='yes');
+  var tlabel={'實體':'實體接觸型','數位':'數位網路型','兼具':'實體+數位'}[ct];
+  var parts=[];
+  parts.push('屬性:'+(pr==='待確認'?'待確認(影像達門檻但未見剝削要素,疑自拍/合意,須再釐清)':'屬性剝削'));
+  if(state.status){
+    parts.push('狀態:'+{'在家':'在家/社區','已安置':'已在安置中','感化':'感化教育/矯正中'}[state.status]);
+    if(state.status==='已安置')parts.push('已安置 → 不重複啟動緊急安置,改評現安置是否足以因應本案,返家可行性不適用');
+    else if(state.status==='感化')parts.push('矯正中 → 緊急安置不適用,重點放感化期間及出所後處遇銜接');
+  }
+  parts.push(contact?'涉性交/猥褻接觸 → 走性侵害減述':'無性交/猥褻接觸 → 不走減述');
+  if(vuln)parts.push('未滿12/心障 → 競合兒少權法最佳利益');
+  res.className='result info show';
+  res.innerHTML='<b>型態:'+tlabel+'。</b><div class="sub">'+parts.join(';')+'。續進法定觸發。</div>';
+  if(contact)rem.classList.add('show');else rem.classList.remove('show');
+}
+function renderProp(){
+  [['listA',PROP_A,'c-ibsa','pa'],['listB',PROP_B,'c-trig','pb'],['listC',PROP_C,'c-tex','pc']].forEach(function(g){
+    var box=document.getElementById(g[0]);if(!box)return;box.innerHTML='';
+    g[1].forEach(function(it){box.appendChild(optRow(it,g[2],g[3]));});
+  });
+}
+function wireSeg(id,key,cls){
+  var seg=document.getElementById(id);if(!seg)return;
+  var btns=seg.querySelectorAll('button');
+  btns.forEach(function(b){b.addEventListener('click',function(){
+    state[key]=b.dataset.v;btns.forEach(function(x){x.className='';});b.className=cls;evalRoute();
+  });});
+}
+function wireCaseType(){
+  wireSeg('caseTypeSeg','caseType','on-type');
+  wireSeg('propSeg','prop','on');
+  wireSeg('statusSeg','status','on');
+  var pn=document.getElementById('propNoneBtn');
+  if(pn)pn.addEventListener('click',function(){
+    state.pa={};state.pb={};state.pc={};
+    ['listA','listB','listC'].forEach(function(id){var b=document.getElementById(id);if(b)b.querySelectorAll('.opt').forEach(function(o){o.classList.remove('sel');});});
+    state.prop='非屬';evalRoute();
+  });
+}
+
+function renderTrig(){
+  var box=document.getElementById('trigList');box.innerHTML='';
+  TRIG.forEach(function(g){
+    box.appendChild(el('<div class="grp">'+g.grp+'</div>'));
+    g.items.forEach(function(it){
+      var pill=it.pill==='now'?'<span class="pill now">即觸發</span>':(it.pill==='gray'?'<span class="pill gray">灰區</span>':'');
+      var hasG=it.j||it.note||it.tip;
+      var n=el('<div class="opt c-trig" data-c="'+it.c+'">'+
+        '<div class="opt-h"><div class="box">'+CHK+'</div>'+
+        '<div class="opt-txt"><div class="opt-title"><span class="code">'+it.c+'</span>'+it.t+pill+'</div></div>'+
+        (hasG?'<div class="more">判別</div>':'')+'</div>'+
+        (hasG?'<div class="guide">'+guideHtml(it)+'</div>':'')+'</div>');
+      n.querySelector('.opt-h').addEventListener('click',function(e){
+        if(e.target.classList.contains('more'))return;
+        n.classList.toggle('sel');state.trig[it.c]=n.classList.contains('sel');evalTrig();
+      });
+      var m=n.querySelector('.more');if(m)m.addEventListener('click',function(e){e.stopPropagation();n.classList.toggle('exp');});
+      box.appendChild(n);
+    });
+  });
+}
+function guideHtml(it){var h='';
+  if(it.j)h+='<div class="lbl j">判別重點</div><ul class="jl">'+it.j.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul>';
+  if(it.note)h+='<div class="lbl">說明</div><div>'+it.note+'</div>';
+  if(it.tip)h+='<div class="tip">'+it.tip+'</div>';return h;}
+function evalTrig(){
+  var keys=Object.keys(state.trig).filter(function(k){return state.trig[k];});
+  var res=document.getElementById('trigResult');
+  if(keys.length){res.className='result warn show';
+    res.innerHTML='<b>已觸發安置評估('+keys.length+' 項:'+keys.join('、')+')。</b><div class="sub">觸發不等於必須安置——接著判家庭能否保護,決定「安置」或「列為保護個案後帶回」。</div>';}
+  else res.classList.remove('show');
+  updateRet();
+}
+function trigFired(){return Object.keys(state.trig).some(function(k){return state.trig[k];});}
+function famIncap(){return FAM_INCAP.some(function(c){return state.trig[c];});}
+function retViable(){var h3ok=state.peerPerp?true:state.ret.H3;return state.ret.H1&&state.ret.H2&&h3ok&&!famIncap()&&!state.planWeak;}
+function renderRet(){
+  var list=document.getElementById('retList');if(!list)return;list.innerHTML='';
+  RETURN.forEach(function(it){list.appendChild(optRow(it,'c-ret','ret'));});
+  var pp=el('<div class="opt c-ibsa" id="peerPerpOpt"><div class="opt-h"><div class="box">'+CHK+'</div>'+
+    '<div class="opt-txt"><div class="opt-title">加害人為同儕/同校(接觸由校方管理,非以安置處理)<span class="pill info">校安管理</span></div>'+
+    '<div style="font-size:11.5px;color:var(--ink3);margin-top:5px;line-height:1.5">勾選後,「加害人無法接觸」改由校方分班、校安、禁接觸約定處理,不因校內切不斷而推安置;家若安全則帶回,並須啟動校安接觸管理(校外/線上接觸一併納管)。</div></div></div></div>');
+  pp.querySelector('.opt-h').addEventListener('click',function(){pp.classList.toggle('sel');state.peerPerp=pp.classList.contains('sel');updateRet();});
+  list.appendChild(pp);
+  var pw=el('<div class="opt c-flag" id="planWeakOpt"><div class="opt-h"><div class="box">'+CHK+'</div>'+
+    '<div class="opt-txt"><div class="opt-title">但評估該安全計畫成效堪慮(家長有意願,惟能力/配合/條件受限)<span class="pill flag">降督導</span></div>'+
+    '<div style="font-size:11.5px;color:var(--ink3);margin-top:5px;line-height:1.5">勾選後不自動帶回,改督導確認——權衡加強家庭處遇後帶回,或安置。</div></div></div></div>');
+  pw.querySelector('.opt-h').addEventListener('click',function(){pw.classList.toggle('sel');state.planWeak=pw.classList.contains('sel');updateRet();});
+  list.appendChild(pw);
+}
+function updateRet(){
+  var box=document.getElementById('retBox');if(!box)return;
+  var fired=trigFired(),inc=famIncap();
+  var note=document.getElementById('retNote'),list=document.getElementById('retList'),res=document.getElementById('retResult'),bias=document.getElementById('retBias');
+  if(placedStatus()){
+    box.style.display='';
+    note.className='result info show';note.innerHTML='<b>兒少已在'+(state.status==='感化'?'感化教育/矯正中':'安置中')+',返家可行性不適用。</b><div class="sub">'+(state.status==='感化'?'緊急安置不適用,重點放感化期間及出所後處遇銜接。':'不重複啟動緊急安置,改評現安置是否足以因應本案(加害人能否接觸、是否需調整層級)。')+'本層觸發/覆判作風險紀錄與處遇參考。</div>';
+    bias.style.display='none';list.style.display='none';res.classList.remove('show');return;
+  }
+  if(!fired){box.style.display='none';return;}
+  box.style.display='';
+  if(inc){
+    note.className='result fire show';note.innerHTML='<b>有家長因素觸發,家不是安全的返回對象 → 須安置。</b><div class="sub">返家可行性不適用(1b/7a/7b/8a–c)。</div>';
+    bias.style.display='none';list.style.display='none';res.classList.remove('show');return;
+  }
+  note.className='result';note.classList.remove('show');note.innerHTML='';
+  bias.style.display='block';list.style.display='';
+  if(state.planWeak){res.className='result warn show';res.innerHTML='<b>安全計畫成效堪慮 → 督導確認。</b><div class="sub">家長有意願但成效/能力受限,不自動帶回;提報督導權衡加強家處遇後帶回,或安置。</div>';}
+  else if(retViable()){res.className='result calm show';res.innerHTML='<b>保護條件具備 → 可帶回。</b><div class="sub">列為保護個案+返家,敘事須載明不安置理由。'+(state.peerPerp?'同儕/同校案:接觸由校方分班、校安、禁接觸約定管理,校外/線上接觸一併納管。':'')+'</div>';}
+  else{res.className='result fire show';res.innerHTML='<b>保護條件未齊 → 傾向安置。</b><div class="sub">家長出面有能力、有具體安全計畫、加害人已無法接觸,三者齊備才宜帶回。</div>';}
+}
+function decision(){
+  var s=cvStats(),fired=trigFired(),rv=retViable(),inc=famIncap();
+  var placed=placedStatus(),reframe=false;
+  var supervise=s.supervise||state.planWeak;
+  var place=false,broughtBack=false,superviseOut=false;
+  if(placed){reframe=true;}
+  else if(s.flip||(fired&&inc))place=true;
+  else if(supervise)superviseOut=true;
+  else if(fired&&rv)broughtBack=true;
+  else if(fired&&!rv)place=true;
+  var pa=protAny(),listed=reframe||place||superviseOut||pa;
+  return {s:s,fired:fired,rv:rv,placed:placed,reframe:reframe,supervise:superviseOut,broughtBack:broughtBack,place:place,pa:pa,listed:listed};
+}
+
+function optRow(it,cls,bucket,extraPill){
+  var pill=extraPill||'';
+  var hasMini=it.mini;
+  var n=el('<div class="opt '+cls+'" data-c="'+it.c+'">'+
+    '<div class="opt-h"><div class="box">'+CHK+'</div>'+
+    '<div class="opt-txt"><div class="opt-title">'+it.t+pill+'</div></div>'+
+    (hasMini?'<div class="more">說明</div>':'')+'</div>'+
+    (hasMini?'<div class="guide"><div class="tip" style="background:var(--ibsa-bg);border-color:var(--ibsa-line);color:#155">'+it.mini+'</div></div>':'')+'</div>');
+  n.querySelector('.opt-h').addEventListener('click',function(e){
+    if(e.target.classList.contains('more'))return;
+    n.classList.toggle('sel');state[bucket][it.c]=n.classList.contains('sel');
+    if(bucket==='fan'||bucket==='red'||bucket==='tex')evalCv();
+    if(bucket==='ibsa')evalIbsa();
+    if(bucket==='ret')updateRet();
+    if(bucket==='prot')buildSummary();
+    if(bucket==='pa'||bucket==='pb'||bucket==='pc')evalRoute();
+  });
+  var m=n.querySelector('.more');if(m)m.addEventListener('click',function(e){e.stopPropagation();n.classList.toggle('exp');});
+  return n;
+}
+
+function renderCv(){
+  var box=document.getElementById('cvList');box.innerHTML='';
+  box.appendChild(el('<div class="grp red">人身安全紅旗 · 最先看<span class="gsub">綁架/強迫監禁直接翻盤安置;另兩條提報督導共同決定。</span></div>'));
+  REDFLAG.forEach(function(it){
+    var cls=it.kind==='flip'?'c-flip':'c-flag';
+    var pill=it.kind==='flip'?'<span class="pill flip">直接翻盤</span>':'<span class="pill flag">紅旗·督導確認</span>';
+    box.appendChild(optRow(it,cls,'red',pill));
+  });
+  box.appendChild(el('<div class="grp red">翻盤檢核 · 家長因素補漏<span class="gsub">24 小時指標未觸發時,這塊的翻盤才當決策;已觸發時改寫進處遇。下列為 24 小時指標沒問到的家長無保護能力事實。</span></div>'));
+  var alt=el('<div class="opt c-flag" id="altCarerOpt"><div class="opt-h"><div class="box">'+CHK+'</div>'+
+    '<div class="opt-txt"><div class="opt-title">本案有適當替代照顧者(非加害人、有能力且願意承接)<span class="pill flag">但書</span></div>'+
+    '<div style="font-size:11.5px;color:var(--ink3);margin-top:5px;line-height:1.5">勾選後,下列家長因素的翻盤降為「須督導確認」,不自動安置;綁架/監禁等重大人身安全不受影響。</div></div></div></div>');
+  alt.querySelector('.opt-h').addEventListener('click',function(){alt.classList.toggle('sel');state.altCarer=alt.classList.contains('sel');evalCv();});
+  box.appendChild(alt);
+  box.appendChild(el('<div class="face">高度條件(任一成立 → 翻盤建議安置)</div>'));
+  FANPAN_HI.forEach(function(it){box.appendChild(optRow(it,'c-flip','fan'));});
+  box.appendChild(el('<div class="face">中度情形(跨 2 個面向以上 → 翻盤建議安置)</div>'));
+  var lastFace='';
+  FANPAN_MID.forEach(function(it){
+    if(it.face!==lastFace){box.appendChild(el('<div class="face" style="color:var(--ink3);font-weight:600">· '+it.face+'面向</div>'));lastFace=it.face;}
+    box.appendChild(optRow(it,'c-flag','fan'));
+  });
+  box.appendChild(el('<div class="grp amb">處遇與後追參考 · 不影響安置<span class="gsub">24 小時指標沉默的軸:創傷、慢性化、脆弱。勾了帶出草稿落點;畫面提醒不進文書。</span></div>'));
+  TEXTURE.forEach(function(it){
+    var n=optRow(it,'c-tex','tex');
+    n.appendChild(el('<div class="remind">'+it.remind+'</div>'));
+    box.appendChild(n);
+  });
+}
+function cvStats(){
+  var hi=FANPAN_HI.some(function(it){return state.fan[it.c];});
+  var faces={};FANPAN_MID.forEach(function(it){if(state.fan[it.c])faces[it.face]=1;});
+  var midFaces=Object.keys(faces).length,midFlip=midFaces>=2;
+  var alt=!!state.altCarer;
+  var famAutoPlace=hi&&!alt;
+  var famSupervise=midFlip||(hi&&alt);
+  var rFlip=REDFLAG.some(function(it){return it.kind==='flip'&&state.red[it.c];});
+  var rFlag=REDFLAG.some(function(it){return it.kind==='flag'&&state.red[it.c];});
+  var tex=TEXTURE.filter(function(it){return state.tex[it.c];});
+  return {hi:hi,midFaces:midFaces,midFlip:midFlip,alt:alt,famAutoPlace:famAutoPlace,famSupervise:famSupervise,rFlip:rFlip,rFlag:rFlag,tex:tex,flip:(famAutoPlace||rFlip),supervise:(famSupervise||rFlag)};
+}
+function evalCv(){
+  var s=cvStats(),res=document.getElementById('cvResult');
+  if(s.flip){
+    var why=[];if(s.hi&&!s.alt)why.push('家長因素達高度');if(s.rFlip)why.push('重大人身安全(綁架/強迫監禁)');
+    res.className='result fire show';
+    res.innerHTML='<b>覆判:建議翻盤安置。</b><div class="sub">'+why.join('、')+'。24 小時指標已觸發則一致;未觸發則本層把案件拉回安置。</div>';
+  }else if(s.supervise){
+    var f=[];if(s.midFlip)f.push('家長中度跨'+s.midFaces+'面向');if(s.hi&&s.alt)f.push('家長因素達高度,惟已勾替代照顧者');if(s.rFlag)f.push('與加害人同住/嚴重自傷或懷孕無照顧');
+    res.className='result warn show';
+    res.innerHTML='<b>覆判:須督導確認。</b><div class="sub">'+f.join(';')+'——不自動安置,提報督導共同決定(安置或加強處遇後帶回)。</div>';
+  }else if(s.tex.length){
+    res.className='result calm show';
+    res.innerHTML='<b>覆判:以處遇與後追參考為主。</b><div class="sub">不影響安置決定;勾選項已備妥草稿落點,寫進處遇與後追。</div>';
+  }else res.classList.remove('show');
+}
+
+function renderIbsa(){
+  var box=document.getElementById('ibsaList');box.innerHTML='';
+  IBSA.forEach(function(g){
+    box.appendChild(el('<div class="grp tealc">'+g.grp+'</div>'));
+    g.items.forEach(function(it){box.appendChild(optRow(it,'c-ibsa','ibsa'));});
+  });
+}
+function evalIbsa(){
+  var k=Object.keys(state.ibsa).filter(function(c){return state.ibsa[c];});
+  var res=document.getElementById('ibsaResult');
+  if(!k.length){res.classList.remove('show');return;}
+  var contact=k.some(function(c){return c.indexOf('C1')===0;});
+  var spread=k.some(function(c){return c.indexOf('C2')===0;});
+  var impact=k.some(function(c){return c.indexOf('C3')===0;});
+  var p=[];
+  if(contact)p.push('加害人仍可接觸 → 安全前提未成立,先處理接觸風險');
+  if(spread)p.push('影像擴散 → 蒐證、送性影像處理中心/性影像比對移除計畫下架、勿因威脅再傳');
+  if(impact)p.push('衝擊延遲性 → 後追留創傷揭露觀察窗');
+  res.className='result warn show';
+  res.innerHTML='<b>數位風險提示(不觸發安置)。</b><div class="sub">'+p.join(';')+'。</div>';
+}
+function ibsaActive(){return Object.keys(state.ibsa).some(function(c){return state.ibsa[c];});}
+
+function renderRecov(){
+  document.querySelectorAll('#recovChips .chip').forEach(function(c){
+    c.addEventListener('click',function(){c.classList.toggle('on');state.recov[c.dataset.g]=c.classList.contains('on');buildDraft();});
+  });
+}
+function renderProtect(){
+  var box=document.getElementById('protectList');if(!box)return;box.innerHTML='';
+  PROTECT.forEach(function(it){box.appendChild(optRow(it,'c-flip','prot'));});
+}
+function protAny(){return PROTECT.some(function(it){return state.prot[it.c];});}
+function dispInfo(d){
+  if(d.reframe)return {txt:(state.status==='感化'?'維持矯正處遇 · 銜接出所後追蹤':'維持/調整現安置'),cls:'reframe'};
+  if(d.place)return {txt:'啟動緊急安置',cls:'place'};
+  if(d.supervise)return {txt:'提報督導確認',cls:'supervise'};
+  if(d.broughtBack)return {txt:d.listed?'帶回返家':'帶回 · 轉介學校處理',cls:'back'};
+  if(d.listed)return {txt:'帶回 · 開案輔導',cls:'back'};
+  return {txt:'不列為 · 轉介資源',cls:'refer'};
+}
+function buildSummary(){
+  var box=document.getElementById('sumBox');box.innerHTML='';
+  var r=state.route,routeDone=(r.q1!==undefined)&&(r.q2!==undefined)&&state.caseType;
+  var contact=(r.q2==='yes'),vuln=(r.q1==='yes'),pr=propResult();
+  var trigKeys=Object.keys(state.trig).filter(function(k){return state.trig[k];});
+  var d=decision(),s=d.s;
+  function line(k,v,cls){box.appendChild(el('<div class="sum-line '+(cls||'')+'"><div class="k">'+k+'</div><div class="v">'+v+'</div></div>'));}
+  var tlabel={'實體':'實體接觸型','數位':'數位網路型','兼具':'實體+數位'}[state.caseType]||'(未選)';
+
+  if(pr==='非屬'){
+    box.appendChild(el('<div class="conclusion exit"><div class="big">傾向非屬性剝削</div><div class="mid">轉介 · 非性剝削處理</div><div class="sm">未達猥褻/性影像門檻。確認後依非性剝削處理(網安/自我保護輔導),本 24 小時安置流程不適用。</div></div>'));
+    buildDraft();return;
+  }
+
+  var di=dispInfo(d);
+  box.appendChild(el('<div class="conclusion '+di.cls+'"><div class="big">'+di.txt+'</div><div class="mid">'+(d.listed?'列為保護個案':'不列為保護個案')+'</div>'+
+    (pr==='待確認'?'<div class="sm">屬性待確認:影像達門檻但未見剝削要素,疑自拍/合意,先釐清有無隱藏誘騙/脅迫/散布。</div>':'')+'</div>'));
+
+  line('案件型態',tlabel);
+  line('案件性質',!routeDone?'(快篩未完成)':((contact?'涉性交/猥褻接觸,走減述':'不走減述')+(vuln?';競合兒少權法最佳利益':'')));
+  if(state.status)line('當前狀態',{'在家':'在家/社區','已安置':'已在安置中(返家可行性不適用)','感化':'感化教育/矯正中(緊急安置不適用)'}[state.status]);
+  line('法定觸發',(d.fired?'已觸發('+trigKeys.length+'項):'+trigKeys.join('、'):'未勾選任何觸發項')+(d.placed?' · 作風險紀錄用':''));
+  var cv;
+  if(s.flip)cv='翻盤建議安置('+[(s.hi&&!s.alt)?'家長高度':'',s.rFlip?'重大人身安全':''].filter(Boolean).join('、')+')';
+  else if(s.supervise)cv='須督導確認('+[s.midFlip?'家長中度跨'+s.midFaces+'面向':'',(s.hi&&s.alt)?'家長高度但有替代照顧者':'',s.rFlag?'紅旗':''].filter(Boolean).join('、')+')';
+  else if(s.tex.length)cv='以處遇與後追參考為主('+s.tex.map(function(t){return t.c;}).join('、')+')';
+  else cv='(未評)';
+  line('危機覆判',cv+(d.placed?' · 供現安置/出所處遇參考':''));
+  if(d.placed)line('返家可行性','不適用(兒少不在家)');
+  else if(d.fired&&!s.flip){
+    var rt=d.broughtBack?'保護條件具備 → 可帶回返家':(d.supervise?(state.planWeak?'安全計畫成效堪慮 → 督導確認':'家長因素 → 督導確認'):'保護條件未齊 → 傾向安置');
+    line('返家可行性',rt,d.broughtBack?'calm':'');
+  }
+  if(ibsaActive()){
+    var k=Object.keys(state.ibsa).filter(function(c){return state.ibsa[c];});
+    var lab=[k.some(function(c){return c.indexOf('C1')===0;})?'接觸性':'',k.some(function(c){return c.indexOf('C2')===0;})?'擴散性':'',k.some(function(c){return c.indexOf('C3')===0;})?'衝擊性':''].filter(Boolean).join('、');
+    line('數位風險(IBSA)',lab+' — 不觸發安置,列處遇/後追');
+  }
+  buildDraft();
+}
+function buildDraft(){
+  var trigTexts=[];
+  TRIG.forEach(function(g){g.items.forEach(function(it){if(state.trig[it.c])trigTexts.push(it.t);});});
+  var d=decision();
+  var L=[];
+  var safety=TEXTURE.filter(function(it){return it.at==='safety'&&state.tex[it.c];});
+  var parent=TEXTURE.filter(function(it){return it.at==='parent'&&state.tex[it.c];});
+  if(safety.length||ibsaActive()){
+    L.push('（一)人身安全議題');
+    safety.forEach(function(it){L.push(it.open+'＿＿＿＿。');});
+    if(ibsaActive()){
+      var ib=[];IBSA.forEach(function(g){g.items.forEach(function(it){if(state.ibsa[it.c])ib.push(it.t);});});
+      L.push('數位風險評估:'+ib.join(';')+'(此處依實際勾選內容帶入,請再依實際個案狀況修改)。');
+    }
+    L.push('');
+  }
+  if(parent.length){
+    L.push('（三)親職教養議題');
+    parent.forEach(function(it){L.push(it.open+'＿＿＿＿。');});
+    L.push('');
+  }
+  L.push('六、本案後續處置');
+  var s1=d.fired?'指出案主有下列危險因素:'+trigTexts.join('、'):'未指出危險因素';
+  var disp;
+  if(d.reframe)disp=(state.status==='感化'?'兒少現於感化教育/矯正中，緊急安置不適用；本案以性剝削被害處遇、列為保護個案，並銜接感化期間及出所後之安全計畫與追蹤為主。':'兒少現於安置中，不重複啟動緊急安置；評估現安置是否足以因應本案風險(加害人能否接觸、是否需調整安置層級或類型)，並列為保護個案續處遇。');
+  else if(d.place)disp='評估有安置需求，啟動緊急安置。';
+  else if(d.supervise)disp='家長有保護意願惟安全計畫成效/能力堪慮，提報督導共同確認後續處置(加強家庭處遇後帶回 或 安置)。';
+  else if(d.broughtBack&&d.listed)disp='評估家庭具保護功能，列為保護個案後交付案〔父／母〕或其他適當之人帶回，開案輔導追蹤。';
+  else if(d.broughtBack)disp='評估家庭具保護功能，且未達性剝削保護個案要件(O1–O6 未成立)，交付案〔父／母〕或其他適當之人帶回，不列為保護個案，轉介學校依校安/輔導機制處理。影像外流部分協助移除，並留意是否升高為性勒索或再犯；如有，回歸性剝削保護程序。';
+  else if(d.listed)disp='交付案〔父／母〕或其他適當之人帶回，開案輔導追蹤。';
+  else disp='視需求轉介相關服務資源。';
+  L.push('本案經 24 小時安置評估指標〔'+s1+'〕，評估'+(d.listed?'列為':'不列為')+'保護個案。'+disp);
+  if(!d.place){
+    var cvChk=[];
+    FANPAN_HI.forEach(function(it){if(state.fan[it.c])cvChk.push(it.t);});
+    FANPAN_MID.forEach(function(it){if(state.fan[it.c])cvChk.push(it.t);});
+    REDFLAG.forEach(function(it){if(state.red[it.c])cvChk.push(it.t);});
+    if(cvChk.length)L.push('另就危機覆判勾選之家庭/人身安全因素〔'+cvChk.join('、')+'〕，後續處遇與訪視應持續關注。');
+    if(state.peerPerp)L.push('加害人為同儕/同校，加害人接觸之管理由校方(分班、校安、禁止接觸約定)處理，並就校外、線上接觸一併納管，非以安置處理。');
+  }
+  document.getElementById('draft').value=L.join('\n');
+}
+
+var TOTAL=5;
+function go(s){
+  s=Math.max(0,Math.min(TOTAL-1,s));state.step=s;
+  document.querySelectorAll('.screen').forEach(function(sc){sc.classList.toggle('on',+sc.dataset.screen===s);});
+  document.querySelectorAll('.step-dot').forEach(function(d){var i=+d.dataset.s;d.classList.toggle('active',i===s);d.classList.toggle('done',i<s);});
+  document.getElementById('backBtn').style.visibility=s===0?'hidden':'visible';
+  var nb=document.getElementById('nextBtn');
+  if(s===1){var tn=document.getElementById('trigNote');
+    if(state.caseType==='數位'){tn.className='result info show';tn.innerHTML='純性影像案:指標多會勾到(尤其 1a 未滿12)。這是脆弱性訊號,不是安置命令——安置只在家庭無法保護或加害人仍能接觸時才對,否則走返家可行性帶回。';}
+    else tn.classList.remove('show');}
+  if(s===2)document.getElementById('texCarry').innerHTML=cvCarry();
+  if(s===3){var nt=document.getElementById('ibsaNote');
+    if(state.caseType==='實體'){nt.className='result info show';nt.innerHTML='純實體接觸型,本層多半可略過(無線上影像/接觸風險)。如仍有數位元素再勾。';}
+    else nt.classList.remove('show');}
+  if(s===TOTAL-1){nb.textContent='完成';buildSummary();}else nb.textContent='下一步';
+  window.scrollTo({top:0});
+}
+function cvCarry(){
+  var keys=Object.keys(state.trig).filter(function(k){return state.trig[k];});
+  if(keys.length)return '24 小時指標已勾 '+keys.length+' 項 → 已進入安置評估。覆判這層補家長因素的漏(可翻盤)、畫處遇輪廓、攔重大人身安全。';
+  return '24 小時指標未勾任何項 → 翻盤檢核特別重要:看家長因素/重大人身安全有沒有把案件拉回安置。';
+}
+document.getElementById('nextBtn').addEventListener('click',function(){if(state.step<TOTAL-1)go(state.step+1);});
+document.getElementById('backBtn').addEventListener('click',function(){go(state.step-1);});
+document.querySelectorAll('.step-dot').forEach(function(d){d.addEventListener('click',function(){go(+d.dataset.s);});});
+document.getElementById('copyBtn').addEventListener('click',function(){
+  var t=document.getElementById('draft');t.select();
+  try{navigator.clipboard.writeText(t.value);}catch(e){document.execCommand('copy');}
+  var b=this;b.textContent='已複製';setTimeout(function(){b.textContent='複製草稿';},1400);
+});
+document.getElementById('resetBtn').addEventListener('click',function(){
+  if(!confirm('清除所有勾選,重新開始?'))return;
+  state={caseType:'',prop:'',pa:{},pb:{},pc:{},status:'',route:{},trig:{},ret:{},peerPerp:false,planWeak:false,fan:{},altCarer:false,tex:{},red:{},prot:{},ibsa:{},recov:{},step:0};
+  renderRoute();renderProp();renderTrig();renderCv();renderIbsa();renderProtect();renderRet();
+  ['caseTypeSeg','propSeg','statusSeg'].forEach(function(id){document.querySelectorAll('#'+id+' button').forEach(function(x){x.className='';});});
+  ['propSec','propReal','propDigital','abcBox','statusSec','flagsSec'].forEach(function(id){var e=document.getElementById(id);if(e)e.style.display='none';});
+  ['routeResult','trigResult','cvResult','ibsaResult','ibsaNote','trigNote'].forEach(function(id){document.getElementById(id).classList.remove('show');});
+  document.getElementById('retBox').style.display='none';
+  document.getElementById('csaReminder').classList.remove('show');go(0);
+});
+
+renderRoute();renderProp();renderTrig();renderCv();renderIbsa();renderProtect();renderRet();wireCaseType();go(0);
+</script>
+</body>
+</html>
