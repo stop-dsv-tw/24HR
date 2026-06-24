@@ -106,6 +106,30 @@
   .abcwrap{margin-top:10px;padding:12px;background:#F7F9FB;border:1px solid var(--line2);border-radius:10px}
   .propnone-btn{margin-top:12px;width:100%;border:1.5px solid var(--ok-line);background:var(--ok-bg);border-radius:9px;padding:11px 10px;font-family:var(--sans);font-size:13px;font-weight:700;color:var(--ok);cursor:pointer;line-height:1.45}
   .propnone-btn:active{background:#dcefe2}
+  .ind5-reframe{font-size:11.5px;color:var(--ink2);background:#F2EEF8;border:1px solid #DDD2EC;border-radius:8px;padding:9px 11px;margin:4px 0 10px;line-height:1.5}
+  .ind5-sub{font-size:11.5px;font-weight:800;margin:13px 0 6px}
+  .ind5-sub.bhv{color:var(--trig)} .ind5-sub.att{color:var(--tex)} .ind5-sub.drv{color:var(--ibsa)}
+  .i5opt{display:flex;gap:9px;align-items:flex-start;padding:9px 10px;background:#fff;border:1px solid var(--line);border-radius:8px;margin-bottom:6px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .i5box{flex:none;width:19px;height:19px;border-radius:5px;border:2px solid #C2CCD8;margin-top:1px;display:flex;align-items:center;justify-content:center;background:#fff}
+  .i5box svg{width:11px;height:11px;opacity:0}
+  .i5opt.on .i5box{background:var(--ibsa);border-color:var(--ibsa)} .i5opt.on .i5box svg{opacity:1}
+  .i5txt{font-size:13px;font-weight:600;line-height:1.4}
+  .i5tag{display:inline-block;font-size:10px;font-weight:700;border-radius:4px;padding:0 5px;margin-left:5px}
+  .i5tag.e1{background:var(--ok-bg);color:var(--ok)} .i5tag.e2{background:var(--route-bg);color:var(--route)} .i5tag.e3{background:#EEE;color:#777}
+  .ind5-seg{display:flex;flex-direction:column;gap:7px}
+  .ind5-seg button{border:1.5px solid var(--line);background:#fff;border-radius:8px;padding:10px 11px;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer;text-align:left;line-height:1.4}
+  .ind5-seg button .i5st{display:block;font-weight:500;font-size:11px;color:var(--ink3);margin-top:2px}
+  .ind5-seg button.on{background:var(--ibsa);border-color:var(--ibsa);color:#fff}
+  .ind5-seg button.on .i5st{color:#D6E8EE}
+  .ind5-need{font-size:11.5px;color:var(--trig);font-weight:700;margin-top:7px}
+  .ind5-result{border-radius:8px;padding:12px;margin-top:12px}
+  .ind5-result.hi{background:var(--trig);color:#fff}
+  .ind5-result.mid{background:var(--tex);color:#fff}
+  .ind5-result.low{background:var(--ok);color:#fff}
+  .ind5-result .i5-lv{font-size:17px;font-weight:800}
+  .ind5-result .i5-mk{font-size:13px;font-weight:700;margin-top:2px;opacity:.97}
+  .ind5-result .i5-line{font-size:12px;margin-top:8px;line-height:1.5;opacity:.95}
+  .ind5-refs{font-size:10.5px;color:var(--ink3);line-height:1.55;margin-top:12px}
   .conclusion{border-radius:12px;padding:18px 16px;margin-bottom:14px;text-align:center;color:#fff}
   .conclusion .big{font-size:23px;font-weight:800;line-height:1.3}
   .conclusion .mid{font-size:15px;font-weight:700;margin-top:7px;opacity:.96}
@@ -328,9 +352,8 @@ var TRIG=[
   {c:"3b",t:"已確定使用毒品",note:"協調警方確認驗尿意願、請示檢察官。受毒品控制涉性產業宜立即安置。"},
   {c:"4",t:"主觀對返家感到不安或害怕(含社工觀察)",pill:"gray",
     j:["看肢體訊號:焦躁、摳手指、發抖、口語與反應不一致、不恰當傻笑。","主觀『不怕』不等於安全——兒少未必意識到危機。"]},
-  {c:"5",t:"對剝削者或色情行業高度認同",pill:"gray",
-    j:["媒介常是熟識信任者(馬伕、男女友、乾哥姊);關係越緊密返家再涉入風險越高。","依賴替代型:非典型正向情感不是同意或無傷的證據。"]},
-  {c:"6a",t:"前有因遭受性剝削被救援之經驗",note:"先查系統前案;查不到再問是否遇過臨檢、被社會局安置過。"},
+  {c:"5",t:"對剝削者或色情行業高度認同",pill:"gray",ind5:true},
+  {c:"6a",t:"前有因遭受性剝削被救援之經驗",note:"先查系統前案;查不到再問是否遇過臨檢、被社會局安置過。",j:["多次被救援仍返回,亦為認同度/陷落深度的行為表現,評估指標5 時併同參酌。"]},
   {c:"6b",t:"曾多次遭受性剝削,但從未被救援",note:"反覆確認有無未通報、未開案之兒保案件與未揭露家暴。"}
  ]},
  {grp:"（二)家長 / 主要照顧者風險因素",items:[
@@ -420,7 +443,7 @@ var IBSA=[
  ]}
 ];
 
-var state={caseType:'',prop:'',pa:{},pb:{},pc:{},status:'',route:{},trig:{},ret:{},peerPerp:false,planWeak:false,fan:{},altCarer:false,tex:{},red:{},prot:{},ibsa:{},recov:{},step:0};
+var state={caseType:'',prop:'',pa:{},pb:{},pc:{},status:'',route:{},trig:{},ret:{},peerPerp:false,planWeak:false,fan:{},altCarer:false,tex:{},red:{},prot:{},ibsa:{},recov:{},ind5:{b:{},a:{},driver:''},step:0};
 function el(h){var d=document.createElement('div');d.innerHTML=h.trim();return d.firstChild;}
 
 function renderRoute(){
@@ -521,7 +544,7 @@ function renderTrig(){
     box.appendChild(el('<div class="grp">'+g.grp+'</div>'));
     g.items.forEach(function(it){
       var pill=it.pill==='now'?'<span class="pill now">即觸發</span>':(it.pill==='gray'?'<span class="pill gray">灰區</span>':'');
-      var hasG=it.j||it.note||it.tip;
+      var hasG=it.j||it.note||it.tip||it.ind5;
       var n=el('<div class="opt c-trig" data-c="'+it.c+'">'+
         '<div class="opt-h"><div class="box">'+CHK+'</div>'+
         '<div class="opt-txt"><div class="opt-title"><span class="code">'+it.c+'</span>'+it.t+pill+'</div></div>'+
@@ -529,6 +552,13 @@ function renderTrig(){
         (hasG?'<div class="guide">'+guideHtml(it)+'</div>':'')+'</div>');
       n.querySelector('.opt-h').addEventListener('click',function(e){
         if(e.target.classList.contains('more'))return;
+        var willSel=!n.classList.contains('sel');
+        if(it.ind5&&willSel&&!state.ind5.driver){
+          n.classList.add('exp');
+          var nd=document.getElementById('ind5-need');
+          if(nd){nd.textContent='↑ 勾選「高度認同」前,請先完成判別:至少做出關鍵區辨、選一個主要驅動。';nd.style.display='block';}
+          return;
+        }
         n.classList.toggle('sel');state.trig[it.c]=n.classList.contains('sel');evalTrig();
       });
       var m=n.querySelector('.more');if(m)m.addEventListener('click',function(e){e.stopPropagation();n.classList.toggle('exp');});
@@ -539,7 +569,78 @@ function renderTrig(){
 function guideHtml(it){var h='';
   if(it.j)h+='<div class="lbl j">判別重點</div><ul class="jl">'+it.j.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul>';
   if(it.note)h+='<div class="lbl">說明</div><div>'+it.note+'</div>';
-  if(it.tip)h+='<div class="tip">'+it.tip+'</div>';return h;}
+  if(it.tip)h+='<div class="tip">'+it.tip+'</div>';
+  if(it.ind5)h+=ind5Scaffold();
+  return h;}
+var IND5_BHV=[
+  {c:"b2",t:"主動招募或介紹其他兒少",e:"1"},
+  {c:"b3",t:"強烈抗拒離開該環境,或抗拒處遇",e:"1"}
+];
+var IND5_ATT=[
+  {c:"a1",t:"維護、合理化加害人,替他保密、不願指認",e:"1"},
+  {c:"a2",t:"想念、主動聯繫、想回到他身邊",e:"1"},
+  {c:"a3",t:"把性交易/拍片/坐檯講成「正常」「我自願的」,以圈內身分為傲",e:"3"},
+  {c:"a4",t:"敵意指向救援者/系統,而非加害人",e:"2"}
+];
+var IND5_CARE={
+  '恐懼':'安全與保護優先——評估威脅來源、阻斷接觸;勿要求其指認加害人。',
+  '依附':'補依附、處理情感/歸屬空缺,辨識並以正向關係替代被填補的需求。',
+  '發展':'發展性介入、性教育與界線教育,避免病理化。',
+  '內化':'價值重建,並支持脫離與長期處遇。'
+};
+function ind5tag(e){return '<span class="i5tag e'+e+'">'+(e==='1'?'①':e==='2'?'②':'③')+'</span>';}
+function ind5Scaffold(){
+  return '<div class="lbl j">判別:被什麼綁住、陷多深</div>'+
+  '<div class="ind5-reframe">不問「他認同嗎」,改問被什麼綁住、陷多深。看似認同加害人者,多為創傷脅迫連結、恐懼或依賴,而非真認同——把順從誤讀為同意,是本領域記錄最完整的失誤。</div>'+
+  '<div class="ind5-sub bhv">一、行為深度(最不靠主觀、最可佐證)</div><div id="ind5-listB"></div>'+
+  '<div class="ind5-sub att">二、連結/態度訊號(會出現,但須小心判別)</div><div id="ind5-listA"></div>'+
+  '<div class="ind5-sub drv">三、關鍵區辨:這些訊號被什麼驅動?(必選)</div>'+
+  '<div class="ind5-seg" id="ind5-drvSeg">'+
+    '<button data-v="恐懼">像恐懼/受威脅下的順從<span class="i5st">怕,不是認同　·　①</span></button>'+
+    '<button data-v="依附">像依附那個人、情感空缺被填補<span class="i5st">依賴替代　·　②＋①</span></button>'+
+    '<button data-v="發展">像發展階段探索,或一時防衛性否認<span class="i5st">③／②</span></button>'+
+    '<button data-v="內化">排除上述後,仍是穩定的價值/身分內化<span class="i5st">③</span></button>'+
+  '</div>'+
+  '<div class="ind5-need" id="ind5-need" style="display:none">↑ 請先選一個主要驅動,才給判定。</div>'+
+  '<div class="ind5-result" id="ind5-result" style="display:none"></div>'+
+  '<div class="ind5-refs">① 實證　② 實務觀察　③ 製作者推論。<b>閾值為製作者自訂、非官方量表。</b><br>參考:Sanchez, Speck &amp; Patrician (2019), J Pediatr Nurs; Reid (2014), Crim Behav Ment Health 24(5); IICSA (2022) Final Report; Casey (2025) National Audit on Group-based CSE; NSPCC Learning, Protecting children from sexual exploitation.</div>';
+}
+function wireInd5(){
+  var lb=document.getElementById('ind5-listB'),la=document.getElementById('ind5-listA');
+  if(!lb||!la)return;lb.innerHTML='';la.innerHTML='';
+  function row(it,bucket,box){
+    var n=el('<div class="i5opt"><div class="i5box">'+CHK+'</div><div class="i5txt">'+it.t+ind5tag(it.e)+'</div></div>');
+    if(state.ind5[bucket][it.c])n.classList.add('on');
+    n.addEventListener('click',function(){n.classList.toggle('on');state.ind5[bucket][it.c]=n.classList.contains('on');judgeInd5();});
+    box.appendChild(n);
+  }
+  IND5_BHV.forEach(function(it){row(it,'b',lb);});
+  IND5_ATT.forEach(function(it){row(it,'a',la);});
+  var seg=document.getElementById('ind5-drvSeg');
+  if(seg)seg.querySelectorAll('button').forEach(function(b){
+    b.classList.toggle('on',b.dataset.v===state.ind5.driver);
+    b.addEventListener('click',function(){state.ind5.driver=b.dataset.v;seg.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');judgeInd5();});
+  });
+  judgeInd5();
+}
+function judgeInd5(){
+  var res=document.getElementById('ind5-result'),need=document.getElementById('ind5-need');
+  if(!res)return;
+  var s=state.ind5,bd=any(s.b),att=any(s.a),drv=s.driver,touched=bd||att;
+  if(touched&&!drv){if(need)need.style.display='block';res.style.display='none';return;}
+  if(need)need.style.display='none';
+  if(!touched&&!drv){res.style.display='none';return;}
+  var cls,lv,mk,why;
+  if(bd){
+    cls='hi';lv='返剝削風險高';mk='建議勾指標5(高度)';
+    why='行為深度成立('+[s.b.b2?'招募同儕':'',s.b.b3?'強抗拒離開':''].filter(Boolean).join('、')+')→ 返回/再被害風險高,支持安置與長期脫離。';
+  }else if(att){
+    if(drv==='內化'){cls='mid';lv='認同度:中';mk='不逕勾為高,提督導確認';why='有態度訊號且驅動指向價值內化,惟無行為深度——尚不足以逕判高度,提督導共同確認。';}
+    else{cls='low';lv='認同度:低';mk='不宜勾為高度認同';why='態度訊號主要由「'+drv+'」驅動 → 屬創傷脅迫連結/發展現象,非價值認同。記低,但把該動力帶進處遇。';}
+  }else{cls='low';lv='認同度:低';mk='不勾指標5';why='未見行為深度與態度訊號。';}
+  res.className='ind5-result '+cls;res.style.display='block';
+  res.innerHTML='<div class="i5-lv">'+lv+'</div><div class="i5-mk">'+mk+'</div><div class="i5-line">'+why+'</div>'+(drv?'<div class="i5-line"><b>主要驅動:'+drv+'</b> → '+IND5_CARE[drv]+'</div>':'');
+}
 function evalTrig(){
   var keys=Object.keys(state.trig).filter(function(k){return state.trig[k];});
   var res=document.getElementById('trigResult');
@@ -596,8 +697,9 @@ function decision(){
   else if(supervise)superviseOut=true;
   else if(fired&&rv)broughtBack=true;
   else if(fired&&!rv)place=true;
-  var pa=protAny(),listed=reframe||place||superviseOut||pa;
-  return {s:s,fired:fired,rv:rv,placed:placed,reframe:reframe,supervise:superviseOut,broughtBack:broughtBack,place:place,pa:pa,listed:listed};
+  var physical=(state.caseType==='實體'||state.caseType==='兼具');
+  var pa=protAny(),listed=reframe||place||superviseOut||pa||physical;
+  return {s:s,fired:fired,rv:rv,placed:placed,reframe:reframe,supervise:superviseOut,broughtBack:broughtBack,place:place,pa:pa,physical:physical,listed:listed};
 }
 
 function optRow(it,cls,bucket,extraPill){
@@ -715,7 +817,7 @@ function dispInfo(d){
   if(d.reframe)return {txt:(state.status==='感化'?'維持矯正處遇 · 銜接出所後追蹤':'維持/調整現安置'),cls:'reframe'};
   if(d.place)return {txt:'啟動緊急安置',cls:'place'};
   if(d.supervise)return {txt:'提報督導確認',cls:'supervise'};
-  if(d.broughtBack)return {txt:d.listed?'帶回返家':'帶回 · 轉介學校處理',cls:'back'};
+  if(d.broughtBack)return {txt:d.listed?'帶回返家':'帶回 · 轉介相關資源',cls:'back'};
   if(d.listed)return {txt:'帶回 · 開案輔導',cls:'back'};
   return {txt:'不列為 · 轉介資源',cls:'refer'};
 }
@@ -787,7 +889,7 @@ function buildDraft(){
   else if(d.place)disp='評估有安置需求，啟動緊急安置。';
   else if(d.supervise)disp='家長有保護意願惟安全計畫成效/能力堪慮，提報督導共同確認後續處置(加強家庭處遇後帶回 或 安置)。';
   else if(d.broughtBack&&d.listed)disp='評估家庭具保護功能，列為保護個案後交付案〔父／母〕或其他適當之人帶回，開案輔導追蹤。';
-  else if(d.broughtBack)disp='評估家庭具保護功能，且未達性剝削保護個案要件(O1–O6 未成立)，交付案〔父／母〕或其他適當之人帶回，不列為保護個案，轉介學校依校安/輔導機制處理。影像外流部分協助移除，並留意是否升高為性勒索或再犯；如有，回歸性剝削保護程序。';
+  else if(d.broughtBack)disp='評估家庭具保護功能，且未達性剝削保護個案要件(O1–O6 未成立)，交付案〔父／母〕或其他適當之人帶回，不列為保護個案，轉介相關資源處理。影像外流部分協助移除，並留意是否升高為性勒索或再犯；如有，回歸性剝削保護程序。';
   else if(d.listed)disp='交付案〔父／母〕或其他適當之人帶回，開案輔導追蹤。';
   else disp='視需求轉介相關服務資源。';
   L.push('本案經 24 小時安置評估指標〔'+s1+'〕，評估'+(d.listed?'列為':'不列為')+'保護個案。'+disp);
@@ -834,8 +936,8 @@ document.getElementById('copyBtn').addEventListener('click',function(){
 });
 document.getElementById('resetBtn').addEventListener('click',function(){
   if(!confirm('清除所有勾選,重新開始?'))return;
-  state={caseType:'',prop:'',pa:{},pb:{},pc:{},status:'',route:{},trig:{},ret:{},peerPerp:false,planWeak:false,fan:{},altCarer:false,tex:{},red:{},prot:{},ibsa:{},recov:{},step:0};
-  renderRoute();renderProp();renderTrig();renderCv();renderIbsa();renderProtect();renderRet();
+  state={caseType:'',prop:'',pa:{},pb:{},pc:{},status:'',route:{},trig:{},ret:{},peerPerp:false,planWeak:false,fan:{},altCarer:false,tex:{},red:{},prot:{},ibsa:{},recov:{},ind5:{b:{},a:{},driver:''},step:0};
+  renderRoute();renderProp();renderTrig();wireInd5();renderCv();renderIbsa();renderProtect();renderRet();
   ['caseTypeSeg','propSeg','statusSeg'].forEach(function(id){document.querySelectorAll('#'+id+' button').forEach(function(x){x.className='';});});
   ['propSec','propReal','propDigital','abcBox','statusSec','flagsSec'].forEach(function(id){var e=document.getElementById(id);if(e)e.style.display='none';});
   ['routeResult','trigResult','cvResult','ibsaResult','ibsaNote','trigNote'].forEach(function(id){document.getElementById(id).classList.remove('show');});
@@ -843,7 +945,7 @@ document.getElementById('resetBtn').addEventListener('click',function(){
   document.getElementById('csaReminder').classList.remove('show');go(0);
 });
 
-renderRoute();renderProp();renderTrig();renderCv();renderIbsa();renderProtect();renderRet();wireCaseType();go(0);
+renderRoute();renderProp();renderTrig();wireInd5();renderCv();renderIbsa();renderProtect();renderRet();wireCaseType();go(0);
 </script>
 </body>
 </html>
